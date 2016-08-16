@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.awalon.repository.UrlRankMapper">
+  <resultMap id="BaseResultMap" type="org.awalon.model.UrlRank">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="site_name" jdbcType="VARCHAR" property="siteName" />
+    <result column="site_url" jdbcType="VARCHAR" property="siteUrl" />
+    <result column="alexa_rank" jdbcType="INTEGER" property="alexaRank" />
+    <result column="chinaz_rank" jdbcType="INTEGER" property="chinazRank" />
+    <result column="chinaz_scope" jdbcType="INTEGER" property="chinazScope" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="status" jdbcType="BIT" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, site_name, site_url, alexa_rank, chinaz_rank, chinaz_scope, create_time, update_time, 
+    status
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from url_rank
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from url_rank
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="org.awalon.model.UrlRank">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into url_rank (id, site_name, site_url, 
+      alexa_rank, chinaz_rank, chinaz_scope, 
+      create_time, update_time, status
+      )
+    values (#{id,jdbcType=BIGINT}, #{siteName,jdbcType=VARCHAR}, #{siteUrl,jdbcType=VARCHAR}, 
+      #{alexaRank,jdbcType=INTEGER}, #{chinazRank,jdbcType=INTEGER}, #{chinazScope,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=BIT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.awalon.model.UrlRank">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into url_rank
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      id,
+      <if test="siteName != null">
+        site_name,
+      </if>
+      <if test="siteUrl != null">
+        site_url,
+      </if>
+      <if test="alexaRank != null">
+        alexa_rank,
+      </if>
+      <if test="chinazRank != null">
+        chinaz_rank,
+      </if>
+      <if test="chinazScope != null">
+        chinaz_scope,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{id,jdbcType=BIGINT},
+      <if test="siteName != null">
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="siteUrl != null">
+        #{siteUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="alexaRank != null">
+        #{alexaRank,jdbcType=INTEGER},
+      </if>
+      <if test="chinazRank != null">
+        #{chinazRank,jdbcType=INTEGER},
+      </if>
+      <if test="chinazScope != null">
+        #{chinazScope,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.awalon.model.UrlRank">
+    update url_rank
+    <set>
+      <if test="siteName != null">
+        site_name = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="siteUrl != null">
+        site_url = #{siteUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="alexaRank != null">
+        alexa_rank = #{alexaRank,jdbcType=INTEGER},
+      </if>
+      <if test="chinazRank != null">
+        chinaz_rank = #{chinazRank,jdbcType=INTEGER},
+      </if>
+      <if test="chinazScope != null">
+        chinaz_scope = #{chinazScope,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=BIT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.awalon.model.UrlRank">
+    update url_rank
+    set site_name = #{siteName,jdbcType=VARCHAR},
+      site_url = #{siteUrl,jdbcType=VARCHAR},
+      alexa_rank = #{alexaRank,jdbcType=INTEGER},
+      chinaz_rank = #{chinazRank,jdbcType=INTEGER},
+      chinaz_scope = #{chinazScope,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=BIT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
