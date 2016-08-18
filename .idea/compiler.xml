@@ -24,9 +24,17 @@
         <processorPath useClasspath="true" />
         <module name="spf" />
       </profile>
+      <profile default="false" name="Annotation profile for webmagicAwalon" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="webmagicAwalon" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="spf" target="1.8" />
+      <module name="webmagicAwalon" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

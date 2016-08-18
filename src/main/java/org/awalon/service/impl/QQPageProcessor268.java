@@ -7,10 +7,14 @@ import org.awalon.model.QQ268Model;
 import org.awalon.model.QQ269Model;
 import org.awalon.utils.JinshanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 import java.util.ArrayList;
@@ -57,7 +61,7 @@ public class QQPageProcessor268 implements PageProcessor {
         }};
 
         List<String> list = new ArrayList<>();
-        /*//推荐-大家都在看
+        //推荐-大家都在看
         list.add("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=268&pos=0&size=1000");
         //推荐-精品推荐
         list.add("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=165&pos=0&size=1000");
@@ -110,7 +114,7 @@ public class QQPageProcessor268 implements PageProcessor {
         list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=172&sortkey=2&pos=0");
         //超值购物
         list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=174&sortkey=1&pos=0");
-        list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=174&sortkey=2&pos=0");*/
+        list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=174&sortkey=2&pos=0");
 
         //分类 腾讯专区 人气
         list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=206&sortkey=1&pos=10");
@@ -205,7 +209,7 @@ public class QQPageProcessor268 implements PageProcessor {
         try{
             QQ268Model qq268Model = JSONObject.parseObject(page.getRawText(), QQ268Model.class);
             for(int k = 0 ; k < qq268Model.getDataList().size(); k ++){
-                /*DataList dt = qq268Model.getDataList().get(k);
+                DataList dt = qq268Model.getDataList().get(k);
                 String json = JinshanUtil.execute(dt.getTo_href());
                 PhishResult result = JSONObject.parseObject(json,PhishResult.class);
                 if(result.getSuccess().intValue() == 0){
@@ -214,7 +218,7 @@ public class QQPageProcessor268 implements PageProcessor {
                     dt.setCode(1);
                     dt.setPhish(result.getPhish().intValue());
                 }
-                mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(qq268Model.getGroupId())));*/
+                mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(qq268Model.getGroupId())));
             }
         }catch (Exception e){
             QQ269Model qq269Model = JSONObject.parseObject(page.getRawText(), QQ269Model.class);
@@ -256,13 +260,12 @@ public class QQPageProcessor268 implements PageProcessor {
 
     public static void main(String[] args) {
 
-        /*ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/applicationContext.xml");
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/applicationContext.xml");
         final QQPageProcessor268 process = applicationContext.getBean(QQPageProcessor268.class);
         Spider.
                 create(process).
                 addUrl("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=268&pos=0&size=1000")
-                .addPipeline(new JsonFilePipeline("D:\\webmagic\\")).run();*/
-        String json = JinshanUtil.execute("baidu.com");
-        System.out.println(json);
+                .addPipeline(new JsonFilePipeline("D:\\webmagic\\")).run();
+
     }
 }

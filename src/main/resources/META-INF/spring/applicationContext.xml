@@ -20,7 +20,7 @@
 		http://www.springframework.org/schema/task
 		http://www.springframework.org/schema/task/spring-task-4.1.xsd"> 
         
-    <context:component-scan base-package="org.spf">
+    <context:component-scan base-package="org.awalon">
     	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
     

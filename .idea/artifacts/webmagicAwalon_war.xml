@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="webmagicAwalon:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="awalon.war">
+      <element id="artifact" artifact-name="webmagicAwalon:war exploded" />
+    </root>
+  </artifact>
+</component>
