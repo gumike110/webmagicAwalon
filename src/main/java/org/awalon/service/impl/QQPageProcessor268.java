@@ -1,6 +1,13 @@
 package org.awalon.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mongodb.DBCollection;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.awalon.XlsFilePipeline;
 import org.awalon.model.DataList;
 import org.awalon.model.PhishResult;
 import org.awalon.model.QQ268Model;
@@ -16,20 +23,22 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.JsonFilePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.selector.Json;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 /**
  * Created by guming on 2016-08-15.
  */
 @Service
 public class QQPageProcessor268 implements PageProcessor {
-
-
-
 
     private Site site = Site.me();
 
@@ -63,7 +72,7 @@ public class QQPageProcessor268 implements PageProcessor {
         List<String> list = new ArrayList<>();
         //推荐-大家都在看
         list.add("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=268&pos=0&size=1000");
-        //推荐-精品推荐
+        /*//推荐-精品推荐
         list.add("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=165&pos=0&size=1000");
         //名站
         list.add("http://app.html5.qq.com/x5/ajax?action=getData&columnId=37&groupId=166&pos=0&size=1000");
@@ -201,14 +210,15 @@ public class QQPageProcessor268 implements PageProcessor {
         //超值购物
         list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=174&sortkey=1&pos=20");
         list.add("http://app.html5.qq.com/x5/ajax?action=getSortGroupDetails&ColumnId=36&GroupId=174&sortkey=2&pos=20");
-
+*/
         // i = 0-5 用qq268, 其余的用qq269
 
         page.addTargetRequests(list);
 
         try{
             QQ268Model qq268Model = JSONObject.parseObject(page.getRawText(), QQ268Model.class);
-            for(int k = 0 ; k < qq268Model.getDataList().size(); k ++){
+            page.putField("qq_"+map.get(Integer.valueOf(qq268Model.getGroupId())),qq268Model.getDataList());
+            /*for(int k = 0 ; k < qq268Model.getDataList().size(); k ++){
                 DataList dt = qq268Model.getDataList().get(k);
                 String json = JinshanUtil.execute(dt.getTo_href());
                 PhishResult result = JSONObject.parseObject(json,PhishResult.class);
@@ -218,11 +228,11 @@ public class QQPageProcessor268 implements PageProcessor {
                     dt.setCode(1);
                     dt.setPhish(result.getPhish().intValue());
                 }
-                mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(qq268Model.getGroupId())));
-            }
+                //mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(qq268Model.getGroupId())));
+            }*/
         }catch (Exception e){
             QQ269Model qq269Model = JSONObject.parseObject(page.getRawText(), QQ269Model.class);
-            List<DataList> lists = qq269Model.getData();
+            /*List<DataList> lists = qq269Model.getData();
             if (page.getUrl().toString().indexOf("sortkey=2") > -1) {
                 for(int k = 0 ; k < lists.size(); k ++){
                     DataList dt = lists.get(k);
@@ -234,7 +244,7 @@ public class QQPageProcessor268 implements PageProcessor {
                         dt.setCode(1);
                         dt.setPhish(result.getPhish().intValue());
                     }
-                    mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(lists.get(0).getGroupID())) + "_1");
+                    //mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(lists.get(0).getGroupID())) + "_1");
                 }
             } else {
                 for(int k = 0 ; k < qq269Model.getData().size(); k ++){
@@ -247,9 +257,9 @@ public class QQPageProcessor268 implements PageProcessor {
                         dt.setCode(1);
                         dt.setPhish(result.getPhish().intValue());
                     }
-                    mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(lists.get(0).getGroupID())) + "_0");
+                    //mongoTemplate.save(dt, "qq_" + map.get(Integer.valueOf(lists.get(0).getGroupID())) + "_0");
                 }
-            }
+            }*/
         }
     }
 
@@ -258,14 +268,83 @@ public class QQPageProcessor268 implements PageProcessor {
         return site;
     }
 
-    public static void main(String[] args) {
+
+    private static String getter(String field){
+        if(field.startsWith("s")){
+            return "get" + field;
+        }else{
+            return "get" + field.substring(0,1).toUpperCase() + field.substring(1);
+        }
+
+
+    }
+
+    public static void main(String[] args) throws NoSuchMethodException, IOException, InvocationTargetException, IllegalAccessException {
 
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/applicationContext.xml");
         final QQPageProcessor268 process = applicationContext.getBean(QQPageProcessor268.class);
         Spider.
                 create(process).
                 addUrl("http://app.html5.qq.com/x5/ajax?action=getData&columnId=35&groupId=268&pos=0&size=1000")
-                .addPipeline(new JsonFilePipeline("D:\\webmagic\\")).run();
+                .addPipeline(new XlsFilePipeline<DataList>("D:\\webmagic\\","qq_m5")).run();
+        /*Set<String> tableNames = process.mongoTemplate.getCollectionNames();
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        for(String tableName : tableNames){
+            HSSFSheet sheet = workbook.createSheet(tableName);
+            HSSFRow row = null;
+            List<DataList> dataLists = process.mongoTemplate.findAll(DataList.class,tableName);
+            int index = 0;
+            for(DataList dataList : dataLists){
+                row = sheet.createRow(index);
+                index ++;
+                Field[] fileds = dataList.getClass().getDeclaredFields();
+                for(short i = 0 ; i < fileds.length ; i ++){
+                    HSSFCell cell = row.createCell(i);
+                    Class c = dataList.getClass();
+                    Method method = c.getMethod(getter(fileds[i].getName()),new Class[]{});
+
+                    Object value = method.invoke(dataList,new Object[] {});
+                    cell.setCellValue(value == null ? "" : value.toString());
+                }
+            }
+        }
+
+        OutputStream out = new FileOutputStream("D:\\111.xls");
+        workbook.write(out);*/
+
+
+        /*try {
+            URL url = new URL("http://push.browser.server.nubia.cn/push.action");
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+
+            urlConnection.setRequestMethod("POST");
+            DataOutputStream out = null;
+            OutputStream outputStream = null;
+            outputStream = urlConnection.getOutputStream();
+            out = new DataOutputStream(new BufferedOutputStream(outputStream,256));
+            out.writeBytes("receiver_value_rule=1&package=cn.nubia.browser&msg_digest=&receiver_value_split=%2C&verify_code=9E61B9839DA99133AE33BCDFF781C60C&platform=1&receiver_type=2&receiver_value=NX613J_Z2_CN_ABCDEFGHIJK108%2CNX513J_Z3_CN_ABCDEFGHIJK109%2CNX508J_Z0_CN_LSZ001JF00J139%2CNX508J_Z0_CN_LSZ001JF00J149%2CNX510J_Z0_CN_xxxxxxxxxxx111%2CNX510J_Z0_CN_xxxxxxxxxxx113%2CN958St_Z0_CN_JSXPH1ID00H123%2CNX513J_Z78_CN_CSXPK1ID00J152%2CNX535J_Z0_CN_2SXPO1GF00K126&app_key=Vjp3SUIE7ZIKl%2151vfzsbniD%40dK%21qu3v&time_to_live=86400&msg_content=%7B%22title%22%3A%22%E5%8F%B0%E9%A3%8E%E7%94%B5%E6%AF%8D%E8%A2%AD%E6%B5%B7%E5%8F%A3%22%2C%22type%22%3A2%2C%22content%22%3A%22%22%2C%22digest%22%3A%22%E5%8F%B0%E9%A3%8E%E7%94%B5%E6%AF%8D%E8%A2%AD%E6%B5%B7%E5%8F%A3%22%2C%22link%22%3A%22%22%2C%22icon_url%22%3A%22%22%2C%22img_url%22%3A%22%22%2C%22extention%22%3A%22%22%2C%22priority%22%3A2%2C%22id%22%3A1471584291938%7D&msg_extras=&send_no=1471584291938");
+            urlConnection.connect();
+            StringBuilder sb = new StringBuilder();
+            InputStream in = urlConnection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+            String line = "";
+            while( (line = reader.readLine()) != null){
+                sb.append(line);
+            }
+            System.out.println(sb.toString());
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }*/
+    }
+
+    private static void exportExcel(OutputStream out){
 
     }
 }

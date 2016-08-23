@@ -17,10 +17,10 @@ import java.util.*;
  */
 public class JinshanUtil {
 
-    public static final String APPKEY = "k-20100";
-    public static final String APPSEC = "4b6f029fb050ff72f8ef8bec7a0c3879";
-    public static final String URI = "/phish/";
-    public static final String HOST = "http://open.pc120.com";
+    public static final String APPKEY = "k-20100".trim();
+    public static final String APPSEC = "4b6f029fb050ff72f8ef8bec7a0c3879".trim();
+    public static final String URI = "/phish/".trim();
+    public static final String HOST = "open.pc120.com".trim();
 
 
     public static String execute(String url){
